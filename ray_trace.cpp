@@ -1,5 +1,5 @@
 //---------------------------------------
-// Program: ray_trace.cpp
+// Program: ray_trace3.cpp
 // Purpose: Demonstrate ray tracing.
 // Author:  John Gauch
 // Date:    Spring 2019
