@@ -30,6 +30,9 @@ const int SPHERES = 10;
 Sphere3D sphere[SPHERES];
 ColorRGB color[SPHERES];
 
+float centerRadius;
+float angle = 0.0f;
+
 //---------------------------------------
 // Calculate random value between [min..max]
 //---------------------------------------
@@ -162,26 +165,36 @@ void init()
 
    // Define array of spheres
    srand(time(NULL));
-   for (int s=0; s<SPHERES; s++)
-   {
-      float cx = myrand(-RADIUS/2, RADIUS/2);
-      float cy = myrand(-RADIUS/2, RADIUS/2);
+
       float cz = myrand(0, RADIUS/2);
       Point3D center;
-      center.set(cx,cy,cz);
+      center.set(0,0,cz);
 
-      float mx = myrand(-RADIUS/100, RADIUS/200);
-      float my = myrand(-RADIUS/100, RADIUS/200);
-      float mz = myrand(-RADIUS/100, RADIUS/200);
       Vector3D motion;
-      motion.set(mx,my,mz);
+      motion.set(0,0,0);
       float radius = myrand(RADIUS/20, RADIUS/10);
-      sphere[s].set(center, motion, radius);
+      sphere[0].set(center, motion, radius);
       int R = rand() % 255;
       int G = rand() % 255;
       int B = rand() % 255;
-      color[s].set(R,G,B);
-   }
+      color[0].set(R,G,B);
+
+      float cx1 = myrand(-RADIUS/2, RADIUS/2);
+      float cy1 = myrand(-RADIUS/2, RADIUS/2);
+      float cz1 = myrand(0, RADIUS/2);
+      Point3D center1;
+      center1.set(cx1,cy1,cz1);
+      float mx1 = myrand(-RADIUS/100, RADIUS/200);
+      float my1 = myrand(-RADIUS/100, RADIUS/200);
+      float mz1 = myrand(-RADIUS/100, RADIUS/200);
+      Vector3D motion1;
+      motion1.set(mx1,my1,mz1);
+      float radius1 = myrand(RADIUS/20, RADIUS/10);
+      sphere[1].set(center1, motion1, radius1);
+      int R1 = rand() % 255;
+      int G1 = rand() % 255;
+      int B1 = rand() % 255;
+      color[1].set(R1,G1,B1);   
 
    // Perform ray tracing
    cout << "camera: 0,0," << position << endl;
@@ -197,6 +210,7 @@ void display()
    glClear(GL_COLOR_BUFFER_BIT);
    glDrawPixels(XDIM, YDIM, GL_RGB, GL_UNSIGNED_BYTE, image);
    glFlush();
+   
 }
 
 //---------------------------------------
@@ -236,37 +250,11 @@ void keyboard(unsigned char key, int x, int y)
 //---------------------------------------
 void timer(int value)
 {
-   // Move bouncing balls
-   int i;
-   for (i = 0; i < SPHERES; i++)
-   {
-      // Update ball position
-      sphere[i].center.px += sphere[i].motion.vx;
-      sphere[i].center.py += sphere[i].motion.vy;
-      sphere[i].center.pz += sphere[i].motion.vz;
+   angle += 0.1;
 
-      // Bounce off walls
-      if (sphere[i].center.px > RADIUS/2 - sphere[i].radius) 
-         {sphere[i].center.px = RADIUS/2 - sphere[i].radius; 
-          sphere[i].motion.vx *= Bounce; }
-      if (sphere[i].center.py > RADIUS/2 - sphere[i].radius) 
-         {sphere[i].center.py = RADIUS/2 - sphere[i].radius; 
-          sphere[i].motion.vy *= Bounce; }
-      if (sphere[i].center.pz > RADIUS/2 - sphere[i].radius) 
-         {sphere[i].center.pz = RADIUS/2 - sphere[i].radius; 
-          sphere[i].motion.vz *= Bounce; }
-      if (sphere[i].center.px < -RADIUS/2 + sphere[i].radius) 
-         {sphere[i].center.px = -RADIUS/2 + sphere[i].radius; 
-          sphere[i].motion.vx *= Bounce; }
-      if (sphere[i].center.py < -RADIUS/2 + sphere[i].radius) 
-         {sphere[i].center.py = -RADIUS/2 + sphere[i].radius; 
-          sphere[i].motion.vy *= Bounce; }
-      if (sphere[i].center.pz < -RADIUS/2 + sphere[i].radius) 
-         {sphere[i].center.pz = -RADIUS/2 + sphere[i].radius; 
-          sphere[i].motion.vz *= Bounce; }
-
-   }
-
+   sphere[1].center.px = sphere[0].center.px + centerRadius * cos(angle);
+   sphere[1].center.py = sphere[0].center.py + centerRadius * sin(angle);
+   
    // Calculate and display image
    ray_trace();
    glutPostRedisplay();
@@ -286,6 +274,10 @@ int main(int argc, char *argv[])
    glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
    glutCreateWindow("Ray Trace");
    init();
+
+   centerRadius = sqrt(pow(sphere[1].center.px - sphere[0].center.px, 2) + 
+                       pow(sphere[1].center.py - sphere[0].center.py, 2) + 
+                       pow(sphere[1].center.pz - sphere[0].center.pz, 2));
 
    // Specify callback function
    glutDisplayFunc(display);
