@@ -72,6 +72,8 @@ void ray_trace()
    // Define light source
    ColorRGB light_color;
    light_color.set(250,250,250);
+   // JG create array of lights
+   // JG 3 or 2 lights and 3 or 2 directions
    Vector3D light_dir;
    light_dir.set(-1,-1,-1);
    light_dir.normalize();
@@ -80,6 +82,7 @@ void ray_trace()
    Phong shader;
    shader.SetCamera(camera);
    shader.SetLight(light_color, light_dir);
+   // JG line above inside the phong shade loop
 
    // Perform ray tracing
    for (int y = 0; y < YDIM; y++)
@@ -129,7 +132,9 @@ void ray_trace()
          // Calculate Phong shade
          if (mode == "phong")
          {
-            // Check to see if in shadow 
+            // JG loop over all the lights
+            // JG Check to see if in shadow 
+            // JG each time a diferent light direction
             if (in_shadow(closest_p, light_dir, closest, sphere, SPHERES))
                shader.SetObject(color[closest], 0.4, 0.0, 0.0, 1);
             else
@@ -138,7 +143,9 @@ void ray_trace()
       
             // Calculate pixel color
             ColorRGB pixel;
+            // set light for the shader
             shader.GetShade(closest_p, closest_n, pixel);
+            // JG each time in the loop different pixel and add them up
             image[y][x][0] = pixel.R;
             image[y][x][1] = pixel.G;
             image[y][x][2] = pixel.B;
